@@ -327,17 +327,65 @@
             transform: scale(0.98);
         }
 
-        /* Speed indicator */
-        .speed-indicator {
-            position: fixed;
-            bottom: 2rem;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 0.9rem;
-            font-style: italic;
-            color: var(--gold);
-            opacity: 0.4;
-            letter-spacing: 0.1em;
+        /* Set time input */
+        .set-time {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
+
+        .set-time label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            opacity: 0.7;
+        }
+
+        .set-time input[type="time"] {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--cream);
+            background: rgba(201, 162, 39, 0.08);
+            border: 1px solid var(--gold-dark);
+            padding: 0.5rem 1rem;
+            letter-spacing: 0.05em;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            color-scheme: dark;
+        }
+
+        .set-time input[type="time"]:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(201, 162, 39, 0.2);
+        }
+
+        .set-btn {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gold);
+            background: rgba(201, 162, 39, 0.08);
+            border: 1px solid var(--gold-dark);
+            padding: 0.5rem 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .set-btn:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(201, 162, 39, 0.2);
+        }
+
+        .set-btn:active {
+            transform: scale(0.97);
+        }
+
     </style>
 </head>
 <body>
@@ -374,10 +422,15 @@
             <span class="period" id="period">AM</span>
         </div>
 
+        <div class="set-time">
+            <label for="timeInput">Set time</label>
+            <input type="time" id="timeInput" value="08:00">
+            <button class="set-btn" id="setBtn">Set</button>
+        </div>
+
         <button class="reset-btn" id="resetBtn">Call It a Day</button>
     </div>
 
-    <div class="speed-indicator">Time flows 8× faster within these walls</div>
 
     <script>
         // Clock configuration
@@ -431,6 +484,7 @@
 
         function resetClock() {
             realStartTime = Date.now();
+            timeInput.value = '08:00';
 
             // Add a subtle flash effect
             document.body.style.transition = 'background 0.3s ease';
@@ -441,6 +495,17 @@
 
             updateClock();
         }
+
+        // Set time from input
+        const timeInput = document.getElementById('timeInput');
+        function setTimeFromInput() {
+            if (!timeInput.value) return;
+            const [h, m] = timeInput.value.split(':').map(Number);
+            const desiredGameTimeMs = (h * 60 + m) * 60 * 1000;
+            realStartTime = Date.now() - (desiredGameTimeMs - START_GAME_MS) / SPEED_MULTIPLIER;
+            updateClock();
+        }
+        document.getElementById('setBtn').addEventListener('click', setTimeFromInput);
 
         // Event listeners
         resetBtn.addEventListener('click', resetClock);
